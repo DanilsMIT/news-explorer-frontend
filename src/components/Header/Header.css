@@ -6,17 +6,21 @@
   height: 80px;
   padding: 0 104px;
   box-sizing: border-box;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
 }
 
 .header_theme_light {
+  position: relative;
   background-color: #ffffff;
   box-shadow: inset 0 -1px 0 #d1d2d6;
 }
 
 .header__logo {
   font-family: "Roboto Slab", serif;
-  font-weight: 700;
+  font-weight: 450;
   font-size: 20px;
   line-height: 24px;
   text-decoration: none;
@@ -45,6 +49,8 @@
   line-height: 24px;
   box-sizing: border-box;
   color: #ffffff;
+  /* El borde transparente evita que los botones salten hacia los lados cuando se activan */
+  border-bottom: 3px solid transparent;
 }
 
 .header_theme_light .header__link {
@@ -73,6 +79,7 @@
   line-height: 24px;
   align-items: center;
   gap: 10px;
+  box-sizing: border-box;
 }
 
 .header_theme_light .header__button {
@@ -122,6 +129,8 @@
 .header_theme_light .header__menu-icon_theme_light {
   background-image: url("../../images/menuDark.svg");
 }
+
+/* MEDIA QUERIES */
 @media screen and (max-width: 768px) {
   .header {
     padding: 0 40px;

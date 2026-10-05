@@ -1,16 +1,28 @@
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import Header from "./components/Header/Header";
 import Main from "./components/Main/Main";
+import About from "./components/About/About";
 import Footer from "./components/Footer/Footer";
+import SavedNews from "./components/SavedNews/SavedNews";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { CurrentUserContext } from "./context/currentUserContext";
-import { useState, useEffect } from "react";
 import Lenis from "lenis";
+import newsData from "./utils/newsData.json";
 
 function App() {
   const [isLoggedin, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({ name: "Danilo" });
+  const [savedArticles, setSavedArticles] = useState([newsData[0]]);
   const navigate = useNavigate();
+
+  const handleSaveArticle = (article) => {
+    setSavedArticles([article, ...savedArticles]);
+  };
+
+  const handleDeleteArticle = (articleId) => {
+    setSavedArticles(savedArticles.filter((a) => a._id !== articleId));
+  };
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -32,7 +44,6 @@ function App() {
   }, []);
 
   const handleLogin = () => {
-    console.log("abriendo formulario");
     setIsLoggedIn(true);
   };
 
@@ -52,8 +63,32 @@ function App() {
         />
 
         <Routes>
-          <Route path="/" element={<Main />} />
-          <Route path="/saved-news" element={<div>Noticias guardadas</div>} />
+          <Route
+            path="/"
+            element={
+              <React.Fragment>
+                <Main
+                  isLoggedIn={isLoggedin}
+                  articles={newsData}
+                  savedArticles={savedArticles}
+                  onSave={handleSaveArticle}
+                  onDelete={handleDeleteArticle}
+                />
+                <About />
+              </React.Fragment>
+            }
+          />
+
+          <Route
+            path="/saved-news"
+            element={
+              <SavedNews
+                isLoggedIn={isLoggedin}
+                savedArticles={savedArticles}
+                onDelete={handleDeleteArticle}
+              />
+            }
+          />
         </Routes>
 
         <Footer />
