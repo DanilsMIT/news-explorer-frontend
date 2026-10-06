@@ -1,3 +1,5 @@
+const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
+
 class NewsApi {
   constructor({ baseUrl, apiKey }) {
     this._baseUrl = baseUrl;
@@ -27,5 +29,5 @@ class NewsApi {
 
 export const newsApi = new NewsApi({
   baseUrl: "https://newsapi.org/v2/everything",
-  apiKey: "399c8f7913c84d6cb60ca3837ec24260",
+  apiKey: API_KEY,
 });
