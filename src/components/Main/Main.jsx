@@ -1,10 +1,23 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./Main.css";
 import gsap from "gsap";
 import NewsCardList from "../NewsCardList/NewsCardList";
+import Preloader from "../Preloader/Preloader";
+import NotFound from "../NotFound/NotFound";
 
-function Main({ isLoggedIn, articles, savedArticles, onSave, onDelete }) {
+function Main({
+  isLoggedIn,
+  articles = [],
+  savedArticles,
+  onSave,
+  onDelete,
+  onSearch,
+  isSearching,
+  hasSearched,
+  searchError,
+}) {
   const heroRef = useRef(null);
+  const [keyword, setKeyword] = useState("");
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -20,6 +33,14 @@ function Main({ isLoggedIn, articles, savedArticles, onSave, onDelete }) {
     return () => ctx.revert();
   }, []);
 
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+
+    if (keyword.trim()) {
+      onSearch(keyword.trim());
+    }
+  };
+
   return (
     <main className="main">
       <section className="hero" ref={heroRef}>
@@ -33,11 +54,13 @@ function Main({ isLoggedIn, articles, savedArticles, onSave, onDelete }) {
             tu cuenta personal.
           </p>
 
-          <form className="search-form">
+          <form className="search-form" onSubmit={handleSearchSubmit}>
             <input
               type="text"
               className="search-form__input"
               placeholder="Introduce un tema"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
               required
             />
 
@@ -48,13 +71,21 @@ function Main({ isLoggedIn, articles, savedArticles, onSave, onDelete }) {
         </div>
       </section>
 
-      <NewsCardList
-        articles={articles}
-        savedArticles={savedArticles}
-        isLoggedIn={isLoggedIn}
-        onSave={onSave}
-        onDelete={onDelete}
-      />
+      {isSearching && <Preloader />}
+
+      {!isSearching &&
+        hasSearched &&
+        (articles.length === 0 || searchError) && <NotFound />}
+
+      {!isSearching && hasSearched && articles.length > 0 && (
+        <NewsCardList
+          articles={articles}
+          savedArticles={savedArticles}
+          isLoggedIn={isLoggedIn}
+          onSave={onSave}
+          onDelete={onDelete}
+        />
+      )}
     </main>
   );
 }

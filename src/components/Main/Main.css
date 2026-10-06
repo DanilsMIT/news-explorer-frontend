@@ -4,7 +4,6 @@
   flex-direction: column;
 }
 
-/* Modificado para forzar el centrado absoluto de su contenido interno */
 .hero {
   background-image: url("../../images/georgia-de-lotz.png");
   background-size: cover;
@@ -14,19 +13,16 @@
   min-height: 576px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* CENTRA HORIZONTALMENTE LA CAJA HIJA */
-  justify-content: center; /* CENTRA VERTICALMENTE LA CAJA HIJA */
-  padding: 80px 104px 0 104px; /* 80px top para que el header flotante no tape */
+  align-items: center;
+  justify-content: center;
+  padding: 80px 104px 0; /* <-- AQUÍ ESTÁ LA SOLUCIÓN AL SOLAPAMIENTO */
   box-sizing: border-box;
 }
 
 .hero__content {
   width: 100%;
   max-width: 608px;
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* CENTRA EL BUSCADOR Y LOS BOTONES */
-  text-align: center; /* ASEGURA QUE EL TEXTO ESTÉ EN EL MEDIO */
+  text-align: center;
   color: #ffffff;
 }
 
@@ -36,7 +32,6 @@
   font-size: 60px;
   line-height: 64px;
   margin: 0 0 32px 0;
-  width: 100%;
 }
 
 .hero__subtitle {
@@ -45,14 +40,13 @@
   font-size: 18px;
   line-height: 24px;
   margin: 0 0 88px 0;
-  width: 100%;
 }
 
 .search-form {
+  position: relative;
   display: flex;
   width: 100%;
   height: 64px;
-  position: relative;
 }
 
 .search-form__input {
@@ -83,17 +77,15 @@
   font-size: 18px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  box-sizing: border-box;
 }
 
 .search-form__button:hover {
   background-color: #347eff;
 }
 
-/* MEDIA QUERIES */
 @media screen and (max-width: 768px) {
   .hero {
-    padding: 80px 40px 0 40px;
+    padding: 80px 40px 0; /* Protege el header en tablet */
   }
   .hero__title {
     font-size: 36px;
@@ -107,8 +99,16 @@
 
 @media screen and (max-width: 480px) {
   .hero {
-    padding: 80px 16px 0 16px;
+    padding: 86px 16px 0; /* Protege el header en móvil */
     min-height: 480px;
+  }
+  .hero__title {
+    font-size: 36px;
+    line-height: 40px;
+    margin-bottom: 16px;
+  }
+  .hero__subtitle {
+    margin-bottom: 122px;
   }
   .search-form {
     flex-direction: column;
@@ -123,5 +123,6 @@
     position: static;
     width: 100%;
     height: 56px;
+    margin-bottom: 32px;
   }
 }

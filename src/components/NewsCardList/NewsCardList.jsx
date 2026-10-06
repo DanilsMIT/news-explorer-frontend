@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import "./NewsCardList.css";
 import NewsCard from "../NewsCard/NewsCard";
 import { useLocation } from "react-router-dom";
@@ -12,6 +13,20 @@ function NewsCardList({
   const location = useLocation();
   const isSavedNewsRoute = location.pathname === "/saved-news";
 
+  const [visibleCount, setVisibleCount] = useState(3);
+
+  useEffect(() => {
+    setVisibleCount(3);
+  }, [articles]);
+
+  const handleShowMore = () => {
+    setVisibleCount((prev) => prev + 3);
+  };
+
+  const displayedArticles = isSavedNewsRoute
+    ? articles
+    : articles.slice(0, visibleCount);
+
   return (
     <section
       className={`search-results ${
@@ -23,24 +38,35 @@ function NewsCardList({
       )}
 
       <ul className="search-results__list">
-        {articles.map((card) => {
-          const isSaved = savedArticles.some((saved) => saved._id === card._id);
+        {displayedArticles.map((card, index) => {
+          const uniqueKey = card._id || card.url || card.link || index;
+
+          const isSaved = savedArticles.some((saved) => {
+            const savedIdentifier = saved.url || saved.link;
+            const cardIdentifier = card.url || card.link;
+            return savedIdentifier === cardIdentifier;
+          });
 
           return (
             <NewsCard
-              key={card._id}
+              key={uniqueKey}
               card={card}
               isLoggedIn={isLoggedIn}
               isSaved={isSaved}
               onSave={onSave}
               onDelete={onDelete}
+              isSavedNewsRoute={isSavedNewsRoute}
             />
           );
         })}
       </ul>
 
-      {!isSavedNewsRoute && (
-        <button className="search-results__show-more" type="button">
+      {!isSavedNewsRoute && visibleCount < articles.length && (
+        <button
+          className="search-results__show-more"
+          type="button"
+          onClick={handleShowMore}
+        >
           Ver más
         </button>
       )}

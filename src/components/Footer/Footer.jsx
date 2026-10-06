@@ -4,6 +4,9 @@ import githubIcon from "../../images/github.svg";
 import facebookIcon from "../../images/fb.svg";
 
 function Footer() {
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   return (
     <footer className="footer">
       <p className="footer__copyright">
@@ -11,7 +14,7 @@ function Footer() {
       </p>
 
       <nav className="footer__nav">
-        <Link to="/" className="footer__link">
+        <Link to="/" className="footer__link" onClick={handleScrollToTop}>
           Inicio
         </Link>
         <a

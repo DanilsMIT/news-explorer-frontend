@@ -1,65 +1,84 @@
-import { useState } from "react";
-import { useLocation } from "react-router-dom";
 import "./NewsCard.css";
 
-function NewsCard({ card, isLoggedIn }) {
-  const [isSaved, setIsSaved] = useState(false);
-  const location = useLocation();
-  const isSavedNewsRoute = location.pathname === "/saved-news";
+function NewsCard({
+  card,
+  isLoggedIn,
+  isSaved,
+  onSave,
+  onDelete,
+  isSavedNewsRoute,
+}) {
+  const title = card.title;
+  const text = card.description || card.text;
+  const rawDate = card.publishedAt || card.date;
+  const source = card.source?.name || card.source;
+  const image = card.urlToImage || card.image;
+  const link = card.url || card.link;
+  const keyword =
+    card.keyword || localStorage.getItem("lastKeyword") || "Noticias";
 
-  const handleActionClick = () => {
-    if (!isSavedNewsRoute && isLoggedIn) {
-      setIsSaved(!isSaved);
+  const formattedDate = new Date(rawDate).toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const handleSaveClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isLoggedIn && !isSavedNewsRoute) return;
+
+    if (isSaved || isSavedNewsRoute) {
+      onDelete(card);
+    } else {
+      onSave(card);
     }
   };
 
-  let buttonClass = "news-card__action-button ";
-
-  if (isSavedNewsRoute) {
-    buttonClass += "news-card__action-button_trash";
-  } else if (isSaved) {
-    buttonClass += "news-card__action-button_bookmark_active";
-  } else {
-    buttonClass += "news-card__action-button_bookmark";
-  }
-
   return (
     <li className="news-card">
-      <div className="news-card__image-container">
-        <img src={card.image} alt={card.title} className="news-card__image" />
+      <a
+        href={link}
+        target="_blank"
+        rel="noreferrer"
+        className="news-card__link"
+      >
+        <img className="news-card__image" src={image} alt={title} />
 
         {isSavedNewsRoute && (
-          <div className="news-card__keyword">
-            {card.keyword || "Naturaleza"}
-          </div>
+          <span className="news-card__keyword">{keyword}</span>
         )}
 
-        <div className="news-card__action-container">
-          {isSavedNewsRoute ? (
-            <span className="news-card__tooltip">Eliminar de guardados</span>
-          ) : !isLoggedIn ? (
-            <span className="news-card__tooltip">
-              Inicia sesión para guardar artículos
-            </span>
-          ) : null}
+        <button
+          className={`news-card__button ${
+            isSavedNewsRoute
+              ? "news-card__button_type_delete"
+              : isSaved
+                ? "news-card__button_type_saved"
+                : "news-card__button_type_save"
+          }`}
+          type="button"
+          onClick={handleSaveClick}
+        ></button>
 
-          <button
-            className={buttonClass}
-            type="button"
-            onClick={handleActionClick}
-          ></button>
+        {!isLoggedIn && !isSavedNewsRoute && (
+          <span className="news-card__tooltip">
+            Inicia sesión para guardar artículos
+          </span>
+        )}
+
+        {isSavedNewsRoute && (
+          <span className="news-card__tooltip">Eliminar de guardados</span>
+        )}
+
+        <div className="news-card__info">
+          <p className="news-card__date">{formattedDate}</p>
+          <h3 className="news-card__title">{title}</h3>
+          <p className="news-card__text">{text}</p>
+          <p className="news-card__source">{source}</p>
         </div>
-      </div>
-
-      <div className="news-card__info">
-        <p className="news-card__date">{card.date}</p>
-
-        <h3 className="news-card__title">{card.title}</h3>
-
-        <p className="news-card__text">{card.text}</p>
-
-        <p className="news-card__source">{card.source}</p>
-      </div>
+      </a>
     </li>
   );
 }

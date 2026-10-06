@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import "./Header.css";
 
-function Header({ isLoggedIn, userName, onLoginClick, onLogoutClick }) {
+function Header({ isLoggedIn, currentUser, onLoginClick, onLogout }) {
   const location = useLocation();
   const isSavedNews = location.pathname === "/saved-news";
 
@@ -22,7 +22,7 @@ function Header({ isLoggedIn, userName, onLoginClick, onLogoutClick }) {
           className={`header__menu-icon ${
             isSavedNews ? "header__menu-icon_theme_light" : ""
           }`}
-        />
+        ></span>
       </label>
 
       <nav className="header__nav">
@@ -47,13 +47,13 @@ function Header({ isLoggedIn, userName, onLoginClick, onLogoutClick }) {
         )}
 
         {isLoggedIn ? (
-          <button className="header__button" onClick={onLogoutClick}>
-            {userName}{" "}
+          <button className="header__button" onClick={onLogout}>
+            {currentUser?.name}{" "}
             <span
               className={`header__logout-icon ${
                 isSavedNews ? "header__logout-icon_theme_light" : ""
               }`}
-            />
+            ></span>
           </button>
         ) : (
           <button className="header__button" onClick={onLoginClick}>
