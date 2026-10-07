@@ -10,15 +10,18 @@ function RegisterPopup({ isOpen, onClose, onSwitch, onSubmit }) {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [generalError, setGeneralError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      setEmail("");
-      setPassword("");
-      setUsername("");
-      setEmailError("");
-      setPasswordError("");
-      setGeneralError("");
+      const timer = setTimeout(() => {
+        setEmail("");
+        setPassword("");
+        setUsername("");
+        setEmailError("");
+        setShowPassword(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -76,14 +79,22 @@ function RegisterPopup({ isOpen, onClose, onSwitch, onSubmit }) {
 
         <label className="popup__label">Contraseña</label>
 
-        <input
-          className="popup__input"
-          type="password"
-          placeholder="Introduce tu contraseña"
-          value={password}
-          onChange={handlePasswordChange}
-          required
-        />
+        <div className="popup__password-wrapper">
+          <input
+            className="popup__input"
+            type={showPassword ? "text" : "password"}
+            placeholder="Introduce tu contraseña"
+            value={password}
+            onChange={handlePasswordChange}
+            required
+          />
+          <button
+            type="button"
+            className={`popup__password-toggle ${!showPassword ? "popup__password-toggle_hidden" : ""}`}
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label="Mostrar u ocultar contraseña"
+          ></button>
+        </div>
 
         <span className="popup__input-error">{passwordError}</span>
 

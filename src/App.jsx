@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useEffect, Fragment } from "react";
+import { useState, Fragment } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Header from "./components/Header/Header";
 import Main from "./components/Main/Main";
@@ -13,6 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import { CurrentUserContext } from "./context/currentUserContext";
 import { newsApi } from "./utils/NewsApi";
 
+const generateId = () => Date.now().toString();
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
     () => localStorage.getItem("jwt") !== null,
@@ -29,10 +30,34 @@ function App() {
     return { name: "User" };
   });
 
-  const [savedArticles, setSavedArticles] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
+  const [savedArticles, setSavedArticles] = useState(() => {
+    const localSaved = localStorage.getItem("savedArticles");
+    return localSaved ? JSON.parse(localSaved) : [];
+  });
+
+  const [searchResults, setSearchResults] = useState(() => {
+    const isLogged = localStorage.getItem("jwt") !== null;
+
+    if (isLogged) {
+      const localSearch = localStorage.getItem("lastSearchResults");
+      return localSearch ? JSON.parse(localSearch) : [];
+    }
+
+    return [];
+  });
   const [isSearching, setIsSearching] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+
+  const [hasSearched, setHasSearched] = useState(() => {
+    const isLogged = localStorage.getItem("jwt") !== null;
+
+    if (isLogged) {
+      const localSearch = localStorage.getItem("lastSearchResults");
+      return localSearch && JSON.parse(localSearch).length > 0;
+    }
+
+    return false;
+  });
+
   const [searchError, setSearchError] = useState(false);
 
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
@@ -40,22 +65,6 @@ function App() {
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      const localSaved =
-        JSON.parse(localStorage.getItem("savedArticles")) || [];
-      setSavedArticles(localSaved);
-
-      const localSearch =
-        JSON.parse(localStorage.getItem("lastSearchResults")) || [];
-
-      if (localSearch.length > 0) {
-        setSearchResults(localSearch);
-        setHasSearched(true);
-      }
-    }
-  }, [isLoggedIn]);
 
   const closeAllPopups = () => {
     setIsLoginPopupOpen(false);
@@ -92,7 +101,15 @@ function App() {
   const handleLogout = () => {
     setIsLoggedIn(false);
     setCurrentUser({ name: "User" });
+
     localStorage.removeItem("jwt");
+    localStorage.removeItem("lastSearchResults");
+    localStorage.removeItem("lastKeyword");
+    localStorage.removeItem("savedArticles");
+
+    setSearchResults([]);
+    setHasSearched(false);
+
     navigate("/");
   };
 
@@ -131,7 +148,7 @@ function App() {
     } else {
       const newArticle = {
         ...article,
-        _id: Date.now().toString(),
+        _id: generateId(),
         keyword: localStorage.getItem("lastKeyword") || "Noticias",
       };
 

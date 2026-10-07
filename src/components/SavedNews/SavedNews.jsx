@@ -1,17 +1,19 @@
-import "./SavedNews.css";
 import SavedNewsHeader from "../SavedNewsHeader/SavedNewsHeader";
 import NewsCardList from "../NewsCardList/NewsCardList";
 
-function SavedNews({ isLoggedIn, savedArticles, onDelete }) {
+function SavedNews({ savedArticles, onDelete, isLoggedIn }) {
   return (
     <main className="saved-news">
-      <SavedNewsHeader />
-      <NewsCardList
-        articles={savedArticles}
-        savedArticles={savedArticles}
-        isLoggedIn={isLoggedIn}
-        onDelete={onDelete}
-      />
+      {/* ¡Aquí le pasamos savedArticles al Header para que funcione el contador! */}
+      <SavedNewsHeader savedArticles={savedArticles} />
+
+      <section className="saved-news__list-container">
+        <NewsCardList
+          articles={savedArticles}
+          isLoggedIn={isLoggedIn}
+          onDelete={onDelete}
+        />
+      </section>
     </main>
   );
 }

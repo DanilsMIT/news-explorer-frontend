@@ -6,12 +6,17 @@ function LoginPopup({ isOpen, onClose, onSwitch, onSubmit }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [generalError, setGeneralError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      setEmail("");
-      setPassword("");
-      setGeneralError("");
+      const timer = setTimeout(() => {
+        setEmail("");
+        setPassword("");
+        setGeneralError("");
+        setShowPassword(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -43,14 +48,22 @@ function LoginPopup({ isOpen, onClose, onSwitch, onSubmit }) {
 
         <label className="popup__label">Contraseña</label>
 
-        <input
-          className="popup__input"
-          type="password"
-          placeholder="Introduce tu contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <div className="popup__password-wrapper">
+          <input
+            className="popup__input"
+            type={showPassword ? "text" : "password"}
+            placeholder="Introduce tu contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            className={`popup__password-toggle ${!showPassword ? "popup__password-toggle_hidden" : ""}`}
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label="Mostrar u ocultar contraseña"
+          ></button>
+        </div>
 
         <span className="popup__general-error">{generalError}</span>
 

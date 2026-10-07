@@ -16,7 +16,8 @@ function NewsCardList({
   const [visibleCount, setVisibleCount] = useState(3);
 
   useEffect(() => {
-    setVisibleCount(3);
+    const timer = setTimeout(() => setVisibleCount(3), 0);
+    return () => clearTimeout(timer);
   }, [articles]);
 
   const handleShowMore = () => {

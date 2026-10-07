@@ -1,9 +1,9 @@
 class MainApi {
   constructor({ baseUrl }) {
-    this._baseUrl = baseUrl;
+    this.baseUrl = baseUrl;
   }
 
-  _checkResponse(res) {
+  checkResponse(res) {
     if (res.ok) {
       return res.json();
     }
@@ -11,58 +11,58 @@ class MainApi {
   }
 
   register(email, password, name) {
-    return fetch(`${this._baseUrl}/signup`, {
+    return fetch(`${this.baseUrl}/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, name }),
-    }).then(this._checkResponse);
+    }).then(this.checkResponse);
   }
 
   login(email, password) {
-    return fetch(`${this._baseUrl}/signin`, {
+    return fetch(`${this.baseUrl}/signin`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
-    }).then(this._checkResponse);
+    }).then(this.checkResponse);
   }
 
   checkToken(token) {
-    return fetch(`${this._baseUrl}/users/me`, {
+    return fetch(`${this.baseUrl}/users/me`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    }).then(this._checkResponse);
+    }).then(this.checkResponse);
   }
 
   getArticles(token) {
-    return fetch(`${this._baseUrl}/articles`, {
+    return fetch(`${this.baseUrl}/articles`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }).then(this._checkResponse);
+    }).then(this.checkResponse);
   }
 
   saveArticle(token, articleData) {
-    return fetch(`${this._baseUrl}/articles`, {
+    return fetch(`${this.baseUrl}/articles`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(articleData),
-    }).then(this._checkResponse);
+    }).then(this.checkResponse);
   }
 
   deleteArticle(token, articleId) {
-    return fetch(`\({this._baseUrl}/articles/\){articleId}`, {
+    return fetch(`${this.baseUrl}/articles/${articleId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }).then(this._checkResponse);
+    }).then(this.checkResponse);
   }
 }
 

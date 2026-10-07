@@ -137,7 +137,8 @@
   }
 }
 
-@media screen and (max-width: 480px) {
+/* AQUÍ ESTÁ EL CAMBIO: El menú móvil ahora se activa desde los 600px */
+@media screen and (max-width: 600px) {
   .header {
     padding: 0 16px;
   }

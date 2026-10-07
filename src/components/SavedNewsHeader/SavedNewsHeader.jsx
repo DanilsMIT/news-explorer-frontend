@@ -3,7 +3,7 @@ import "./SavedNewsHeader.css";
 import { CurrentUserContext } from "../../context/currentUserContext";
 import gsap from "gsap";
 
-function SavedNewsHeader() {
+function SavedNewsHeader({ savedArticles = [] }) {
   const currentUser = useContext(CurrentUserContext);
   const headerRef = useRef(null);
 
@@ -21,6 +21,38 @@ function SavedNewsHeader() {
     return () => ctx.revert();
   }, []);
 
+  const totalArticles = savedArticles.length;
+  const keywordsArray = savedArticles.map((article) => article.keyword);
+  const uniqueKeywords = [...new Set(keywordsArray)];
+
+  let keywordsSpan;
+
+  if (uniqueKeywords.length === 1) {
+    keywordsSpan = (
+      <span className="saved-news-header__keywords_bold">
+        {uniqueKeywords[0]}
+      </span>
+    );
+  } else if (uniqueKeywords.length === 2) {
+    keywordsSpan = (
+      <span className="saved-news-header__keywords_bold">
+        {uniqueKeywords[0]} y {uniqueKeywords[1]}
+      </span>
+    );
+  } else if (uniqueKeywords.length > 2) {
+    keywordsSpan = (
+      <>
+        <span className="saved-news-header__keywords_bold">
+          {uniqueKeywords[0]}, {uniqueKeywords[1]}
+        </span>
+        , y{" "}
+        <span className="saved-news-header__keywords_bold">
+          {uniqueKeywords.length - 2} más
+        </span>
+      </>
+    );
+  }
+
   return (
     <section className="saved-news-header" ref={headerRef}>
       <p className="saved-news-header__subtitle saved-news-header__anim">
@@ -28,16 +60,14 @@ function SavedNewsHeader() {
       </p>
 
       <h2 className="saved-news-header__title saved-news-header__anim">
-        {currentUser.name}, tienes 5 artículos guardados
+        {currentUser.name}, tienes {totalArticles} artículos guardados
       </h2>
 
-      <p className="saved-news-header__keywords saved-news-header__anim">
-        Por palabras clave:{" "}
-        <span className="saved-news-header__keywords_bold">
-          Naturaleza, Yellowstone
-        </span>
-        , y <span className="saved-news-header__keywords_bold">2 más</span>
-      </p>
+      {totalArticles > 0 && (
+        <p className="saved-news-header__keywords saved-news-header__anim">
+          Por palabras clave: {keywordsSpan}
+        </p>
+      )}
     </section>
   );
 }

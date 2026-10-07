@@ -1,12 +1,10 @@
-const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
-
 class NewsApi {
   constructor({ baseUrl, apiKey }) {
-    this._baseUrl = baseUrl;
-    this._apiKey = apiKey;
+    this.baseUrl = baseUrl;
+    this.apiKey = apiKey;
   }
 
-  _checkResponse(res) {
+  checkResponse(res) {
     if (res.ok) {
       return res.json();
     }
@@ -21,13 +19,13 @@ class NewsApi {
     const to = toDate.toISOString().split("T")[0];
     const from = fromDate.toISOString().split("T")[0];
 
-    const finalUrl = `${this._baseUrl}?q=${keyword}&apiKey=${this._apiKey}&from=${from}&to=${to}&pageSize=100`;
+    const finalUrl = `${this.baseUrl}?q=${keyword}&apiKey=${this.apiKey}&from=${from}&to=${to}&pageSize=100`;
 
-    return fetch(finalUrl).then((res) => this._checkResponse(res));
+    return fetch(finalUrl).then((res) => this.checkResponse(res));
   }
 }
 
 export const newsApi = new NewsApi({
   baseUrl: "https://newsapi.org/v2/everything",
-  apiKey: API_KEY,
+  apiKey: "399c8f7913c84d6cb60ca3837ec24260",
 });
