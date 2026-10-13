@@ -1,0 +1,128 @@
+.main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  background-image: url("../../images/georgia-de-lotz.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  min-height: 576px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 104px 0; /* <-- AQUÍ ESTÁ LA SOLUCIÓN AL SOLAPAMIENTO */
+  box-sizing: border-box;
+}
+
+.hero__content {
+  width: 100%;
+  max-width: 608px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.hero__title {
+  font-family: "Roboto Slab", serif;
+  font-weight: 400;
+  font-size: 60px;
+  line-height: 64px;
+  margin: 0 0 32px 0;
+}
+
+.hero__subtitle {
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 24px;
+  margin: 0 0 88px 0;
+}
+
+.search-form {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 64px;
+}
+
+.search-form__input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 100px;
+  padding: 0 160px 0 24px;
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+  color: #1a1b22;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.search-form__button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 160px;
+  height: 100%;
+  background-color: #2f71e5;
+  color: #ffffff;
+  border: none;
+  border-radius: 100px;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-form__button:hover {
+  background-color: #347eff;
+}
+
+@media screen and (max-width: 768px) {
+  .hero {
+    padding: 80px 40px 0; /* Protege el header en tablet */
+  }
+  .hero__title {
+    font-size: 36px;
+    line-height: 40px;
+    margin-bottom: 16px;
+  }
+  .hero__subtitle {
+    margin-bottom: 48px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .hero {
+    padding: 86px 16px 0; /* Protege el header en móvil */
+    min-height: 480px;
+  }
+  .hero__title {
+    font-size: 36px;
+    line-height: 40px;
+    margin-bottom: 16px;
+  }
+  .hero__subtitle {
+    margin-bottom: 122px;
+  }
+  .search-form {
+    flex-direction: column;
+    height: auto;
+    gap: 16px;
+  }
+  .search-form__input {
+    height: 56px;
+    padding: 0 24px;
+  }
+  .search-form__button {
+    position: static;
+    width: 100%;
+    height: 56px;
+    margin-bottom: 32px;
+  }
+}
