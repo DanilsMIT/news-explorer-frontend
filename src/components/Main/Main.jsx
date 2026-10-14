@@ -18,6 +18,7 @@ function Main({
 }) {
   const heroRef = useRef(null);
   const [keyword, setKeyword] = useState("");
+  const [inputError, setInputError] = useState("");
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -36,9 +37,20 @@ function Main({
   const handleSearchSubmit = (e) => {
     e.preventDefault();
 
-    if (keyword.trim()) {
-      onSearch(keyword.trim());
+    const sanitizedKeyword = keyword.trim().replace(/\s+/g, " ");
+
+    if (!sanitizedKeyword) {
+      setInputError("Por favor, introduce una palabra clave.");
+      return;
     }
+
+    if (sanitizedKeyword.length < 2) {
+      setInputError("La búsqueda debe tener al menos 2 caracteres.");
+      return;
+    }
+
+    setInputError("");
+    onSearch(sanitizedKeyword);
   };
 
   return (
@@ -55,14 +67,37 @@ function Main({
           </p>
 
           <form className="search-form" onSubmit={handleSearchSubmit}>
-            <input
-              type="text"
-              className="search-form__input"
-              placeholder="Introduce un tema"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              required
-            />
+            <div
+              className="search-form__wrapper"
+              style={{ width: "100%", position: "relative" }}
+            >
+              <input
+                type="text"
+                className="search-form__input"
+                placeholder="Introduce un tema (ej. Tecnología, Marte, IA)"
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                  setInputError("");
+                }}
+              />
+
+              {inputError && (
+                <span
+                  className="search-form__error"
+                  style={{
+                    position: "absolute",
+                    bottom: "-25px",
+                    left: "20px",
+                    color: "#ff0000",
+                    fontSize: "12px",
+                    fontFamily: "Roboto, sans-serif",
+                  }}
+                >
+                  {inputError}
+                </span>
+              )}
+            </div>
 
             <button type="submit" className="search-form__button">
               Buscar

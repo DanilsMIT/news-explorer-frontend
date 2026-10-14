@@ -58,7 +58,7 @@ function RegisterPopup({ isOpen, onClose, onSwitch, onSubmit }) {
     if (isInvalid) return;
 
     setGeneralError("");
-    onSubmit({ email, password, username });
+    onSubmit({ email, password, name: username });
   };
 
   return (

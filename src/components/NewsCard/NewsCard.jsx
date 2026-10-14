@@ -14,8 +14,7 @@ function NewsCard({
   const source = card.source?.name || card.source;
   const image = card.urlToImage || card.image;
   const link = card.url || card.link;
-  const keyword =
-    card.keyword || localStorage.getItem("lastKeyword") || "Noticias";
+  const keyword = card.keyword || "Noticias";
 
   const formattedDate = new Date(rawDate).toLocaleDateString("es-ES", {
     year: "numeric",

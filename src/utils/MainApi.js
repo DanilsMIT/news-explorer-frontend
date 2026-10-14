@@ -3,7 +3,7 @@ class MainApi {
     this.baseUrl = baseUrl;
   }
 
-  checkResponse(res) {
+  _checkResponse(res) {
     if (res.ok) {
       return res.json();
     }
@@ -15,7 +15,7 @@ class MainApi {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, name }),
-    }).then(this.checkResponse);
+    }).then(this._checkResponse);
   }
 
   login(email, password) {
@@ -23,26 +23,27 @@ class MainApi {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
-    }).then(this.checkResponse);
+    }).then(this._checkResponse);
   }
 
-  checkToken(token) {
+  getUserInfo(token) {
     return fetch(`${this.baseUrl}/users/me`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    }).then(this.checkResponse);
+    }).then(this._checkResponse);
   }
 
   getArticles(token) {
     return fetch(`${this.baseUrl}/articles`, {
       method: "GET",
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    }).then(this.checkResponse);
+    }).then(this._checkResponse);
   }
 
   saveArticle(token, articleData) {
@@ -53,19 +54,25 @@ class MainApi {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(articleData),
-    }).then(this.checkResponse);
+    }).then(this._checkResponse);
   }
 
   deleteArticle(token, articleId) {
     return fetch(`${this.baseUrl}/articles/${articleId}`, {
       method: "DELETE",
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    }).then(this.checkResponse);
+    }).then(this._checkResponse);
   }
 }
 
+// Configuración dinámica para producción (Vite)
+const BASE_URL = import.meta.env.PROD
+  ? import.meta.env.BASE_URL
+  : "http://localhost:3001";
+
 export const mainApi = new MainApi({
-  baseUrl: "http://localhost:3000",
+  baseUrl: BASE_URL,
 });

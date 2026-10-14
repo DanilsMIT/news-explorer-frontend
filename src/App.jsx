@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, Fragment } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Header from "./components/Header/Header";
 import Main from "./components/Main/Main";
@@ -12,59 +12,48 @@ import InfoTooltip from "./components/Popup/InfoTooltip/InfoTooltip";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import { CurrentUserContext } from "./context/currentUserContext";
 import { newsApi } from "./utils/NewsApi";
+import { mainApi } from "./utils/MainApi";
 
-const generateId = () => Date.now().toString();
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    () => localStorage.getItem("jwt") !== null,
-  );
-
-  const [currentUser, setCurrentUser] = useState(() => {
-    const storedUser = localStorage.getItem("mockDatabaseUser");
-
-    if (storedUser) {
-      const parsed = JSON.parse(storedUser);
-      return { name: parsed.username || "User" };
-    }
-
-    return { name: "User" };
-  });
-
-  const [savedArticles, setSavedArticles] = useState(() => {
-    const localSaved = localStorage.getItem("savedArticles");
-    return localSaved ? JSON.parse(localSaved) : [];
-  });
-
-  const [searchResults, setSearchResults] = useState(() => {
-    const isLogged = localStorage.getItem("jwt") !== null;
-
-    if (isLogged) {
-      const localSearch = localStorage.getItem("lastSearchResults");
-      return localSearch ? JSON.parse(localSearch) : [];
-    }
-
-    return [];
-  });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState({ name: "User" });
+  const [savedArticles, setSavedArticles] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-
-  const [hasSearched, setHasSearched] = useState(() => {
-    const isLogged = localStorage.getItem("jwt") !== null;
-
-    if (isLogged) {
-      const localSearch = localStorage.getItem("lastSearchResults");
-      return localSearch && JSON.parse(localSearch).length > 0;
-    }
-
-    return false;
-  });
-
+  const [hasSearched, setHasSearched] = useState(false);
   const [searchError, setSearchError] = useState(false);
+  const [currentKeyword, setCurrentKeyword] = useState("");
 
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
   const [isRegisterPopupOpen, setIsRegisterPopupOpen] = useState(false);
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      Promise.all([mainApi.getUserInfo(token), mainApi.getArticles(token)])
+        .then(([userData, articlesData]) => {
+          setCurrentUser({
+            name: userData.name || userData.data?.name || "User",
+          });
+
+          const articles = Array.isArray(articlesData)
+            ? articlesData
+            : articlesData.data || [];
+
+          setSavedArticles(articles.reverse());
+          setIsLoggedIn(true);
+        })
+        .catch((err) => {
+          console.error("Token inválido o expirado:", err);
+          localStorage.removeItem("jwt");
+          setIsLoggedIn(false);
+          setCurrentUser({ name: "User" });
+        });
+    }
+  }, []);
 
   const closeAllPopups = () => {
     setIsLoginPopupOpen(false);
@@ -73,43 +62,58 @@ function App() {
   };
 
   const handleRegisterSubmit = (userData) => {
-    localStorage.setItem("mockDatabaseUser", JSON.stringify(userData));
-    closeAllPopups();
-    setIsInfoTooltipOpen(true);
+    mainApi
+      .register(userData.email, userData.password, userData.name)
+      .then(() => {
+        closeAllPopups();
+        setIsInfoTooltipOpen(true);
+      })
+      .catch((err) => {
+        console.error("Error al registrarse:", err);
+      });
   };
 
   const handleLoginSubmit = ({ email, password, setGeneralError }) => {
-    const storedUserString = localStorage.getItem("mockDatabaseUser");
+    mainApi
+      .login(email, password)
+      .then((data) => {
+        if (data.token) {
+          localStorage.setItem("jwt", data.token);
+          setIsLoggedIn(true);
 
-    if (!storedUserString) {
-      setGeneralError("No hay usuarios registrados. Inscríbete primero.");
-      return;
-    }
+          Promise.all([
+            mainApi.getUserInfo(data.token),
+            mainApi.getArticles(data.token),
+          ])
+            .then(([userData, articlesData]) => {
+              setCurrentUser({
+                name: userData.name || userData.data?.name || "User",
+              });
 
-    const storedUser = JSON.parse(storedUserString);
+              const articles = Array.isArray(articlesData)
+                ? articlesData
+                : articlesData.data || [];
 
-    if (storedUser.email === email && storedUser.password === password) {
-      setIsLoggedIn(true);
-      setCurrentUser({ name: storedUser.username || "User" });
-      localStorage.setItem("jwt", "token-jwt-valido-12345");
-      closeAllPopups();
-    } else {
-      setGeneralError("Correo o contraseña incorrectos.");
-    }
+              setSavedArticles(articles.reverse());
+              closeAllPopups();
+            })
+            .catch(console.error);
+        }
+      })
+      .catch((err) => {
+        console.error("Error al iniciar sesión:", err);
+        setGeneralError("Correo o contraseña incorrectos.");
+      });
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
     setCurrentUser({ name: "User" });
-
     localStorage.removeItem("jwt");
-    localStorage.removeItem("lastSearchResults");
-    localStorage.removeItem("lastKeyword");
-    localStorage.removeItem("savedArticles");
-
     setSearchResults([]);
+    setSavedArticles([]);
     setHasSearched(false);
-
+    setCurrentKeyword("");
     navigate("/");
   };
 
@@ -118,16 +122,12 @@ function App() {
     setHasSearched(true);
     setSearchError(false);
     setSearchResults([]);
+    setCurrentKeyword(keyword);
 
     newsApi
       .getNews(keyword)
       .then((data) => {
         setSearchResults(data.articles || []);
-        localStorage.setItem(
-          "lastSearchResults",
-          JSON.stringify(data.articles || []),
-        );
-        localStorage.setItem("lastKeyword", keyword);
       })
       .catch((err) => {
         console.error(err);
@@ -140,35 +140,51 @@ function App() {
 
   const handleSaveArticle = (article) => {
     const savedArticle = savedArticles.find(
-      (a) => a.url === (article.url || article.link),
+      (a) => a.link === (article.url || article.link),
     );
 
     if (savedArticle) {
       handleDeleteArticle(savedArticle);
     } else {
+      const token = localStorage.getItem("jwt");
+
       const newArticle = {
-        ...article,
-        _id: generateId(),
-        keyword: localStorage.getItem("lastKeyword") || "Noticias",
+        keyword: currentKeyword || "Noticias",
+        title: article.title,
+        text: article.description || "Sin descripción",
+        date: article.publishedAt || article.date,
+        source: article.source?.name || article.source || "Desconocido",
+        link: article.url || article.link,
+        image:
+          article.urlToImage ||
+          article.image ||
+          "https://via.placeholder.com/150",
       };
 
-      const newSavedArticles = [...savedArticles, newArticle];
-
-      setSavedArticles(newSavedArticles);
-      localStorage.setItem("savedArticles", JSON.stringify(newSavedArticles));
+      mainApi
+        .saveArticle(token, newArticle)
+        .then((saved) => {
+          const finalSaved = saved.data || saved;
+          setSavedArticles([finalSaved, ...savedArticles]);
+        })
+        .catch(console.error);
     }
   };
 
   const handleDeleteArticle = (articleToDelete) => {
-    const targetId =
-      articleToDelete._id || articleToDelete.url || articleToDelete.link;
+    const token = localStorage.getItem("jwt");
+    const targetId = articleToDelete._id;
 
-    const newSavedArticles = savedArticles.filter(
-      (a) => a._id !== targetId && a.url !== targetId && a.link !== targetId,
-    );
+    if (!targetId) return;
 
-    setSavedArticles(newSavedArticles);
-    localStorage.setItem("savedArticles", JSON.stringify(newSavedArticles));
+    mainApi
+      .deleteArticle(token, targetId)
+      .then(() => {
+        setSavedArticles((prevArticles) =>
+          prevArticles.filter((a) => a._id !== targetId),
+        );
+      })
+      .catch(console.error);
   };
 
   return (
@@ -186,7 +202,6 @@ function App() {
                   onLoginClick={() => setIsLoginPopupOpen(true)}
                   onSearch={handleSearch}
                 />
-
                 <Main
                   isLoggedIn={isLoggedIn}
                   articles={searchResults}
@@ -198,12 +213,10 @@ function App() {
                   onSave={handleSaveArticle}
                   onDelete={handleDeleteArticle}
                 />
-
                 <About />
               </Fragment>
             }
           />
-
           <Route
             path="/saved-news"
             element={
@@ -214,7 +227,6 @@ function App() {
                     currentUser={currentUser}
                     onLogout={handleLogout}
                   />
-
                   <SavedNews
                     isLoggedIn={isLoggedIn}
                     savedArticles={savedArticles}
