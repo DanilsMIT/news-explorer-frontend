@@ -27,5 +27,5 @@ class NewsApi {
 
 export const newsApi = new NewsApi({
   baseUrl: "https://newsapi.org/v2/everything",
-  apiKey: "399c8f7913c84d6cb60ca3837ec24260",
+  apiKey: import.meta.env.VITE_NEWS_API_KEY,
 });
