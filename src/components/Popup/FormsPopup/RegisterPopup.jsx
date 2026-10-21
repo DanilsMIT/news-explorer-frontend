@@ -34,8 +34,16 @@ function RegisterPopup({ isOpen, onClose, onSwitch, onSubmit }) {
   }, [isOpen]);
 
   const handleUsernameChange = (e) => {
-    setUsername(e.target.value);
-    setUsernameError(e.target.validationMessage);
+    const val = e.target.value;
+    setUsername(val);
+
+    if (!val) {
+      setUsernameError("El nombre de usuario es obligatorio.");
+    } else if (val.length < 2) {
+      setUsernameError("El nombre debe tener al menos 2 caracteres.");
+    } else {
+      setUsernameError(e.target.validationMessage);
+    }
   };
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
