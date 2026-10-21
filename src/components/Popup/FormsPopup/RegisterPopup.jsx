@@ -107,6 +107,7 @@ function RegisterPopup({ isOpen, onClose, onSwitch, onSubmit }) {
             value={password}
             onChange={handlePasswordChange}
             required
+            minLength="8"
           />
           <button
             type="button"

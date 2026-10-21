@@ -50,7 +50,7 @@ function App() {
           setIsLoggedIn(true);
         })
         .catch((err) => {
-          console.error("Token inválido o expirado:", err);
+          console.error(err);
           localStorage.removeItem("jwt");
           setIsLoggedIn(false);
           setCurrentUser({ name: "User" });
@@ -78,8 +78,8 @@ function App() {
         setIsInfoTooltipOpen(true);
       })
       .catch((err) => {
-        console.error("Error al registrarse:", err);
-        if (typeof err === "string" && err.includes("409")) {
+        console.error(err);
+        if (String(err).includes("409")) {
           setGeneralError("Este correo electrónico ya está registrado.");
         } else {
           setGeneralError("Ocurrió un error durante el registro.");
@@ -115,7 +115,7 @@ function App() {
         }
       })
       .catch((err) => {
-        console.error("Error al iniciar sesión:", err);
+        console.error(err);
         if (setGeneralError) {
           setGeneralError("Correo o contraseña incorrectos.");
         }
