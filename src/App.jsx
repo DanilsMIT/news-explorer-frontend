@@ -24,6 +24,7 @@ function App() {
   const [hasSearched, setHasSearched] = useState(false);
   const [searchError, setSearchError] = useState(false);
   const [currentKeyword, setCurrentKeyword] = useState("");
+  const [pendingCredentials, setPendingCredentials] = useState(null);
 
   const [isCheckingToken, setIsCheckingToken] = useState(true);
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
@@ -72,29 +73,7 @@ function App() {
     mainApi
       .register(email, password, name)
       .then(() => {
-        return mainApi.login(email, password);
-      })
-      .then((data) => {
-        if (data.token) {
-          localStorage.setItem("jwt", data.token);
-          setIsLoggedIn(true);
-
-          return Promise.all([
-            mainApi.getUserInfo(data.token),
-            mainApi.getArticles(data.token),
-          ]);
-        }
-      })
-      .then(([userDataResp, articlesData]) => {
-        setCurrentUser({
-          name: userDataResp.name || userDataResp.data?.name || "User",
-        });
-
-        const articles = Array.isArray(articlesData)
-          ? articlesData
-          : articlesData.data || [];
-
-        setSavedArticles(articles.reverse());
+        setPendingCredentials({ email, password });
         closeAllPopups();
         setIsInfoTooltipOpen(true);
       })
@@ -107,6 +86,7 @@ function App() {
         }
       });
   };
+
   const handleLoginSubmit = ({ email, password, setGeneralError }) => {
     mainApi
       .login(email, password)
@@ -136,7 +116,9 @@ function App() {
       })
       .catch((err) => {
         console.error("Error al iniciar sesión:", err);
-        setGeneralError("Correo o contraseña incorrectos.");
+        if (setGeneralError) {
+          setGeneralError("Correo o contraseña incorrectos.");
+        }
       });
   };
 
@@ -220,7 +202,7 @@ function App() {
       })
       .catch(console.error);
   };
-  // pantalla de carga
+
   if (isCheckingToken) {
     return (
       <div className="popup popup_opened popup_type_preloader">
@@ -306,7 +288,15 @@ function App() {
           onClose={closeAllPopups}
           onLoginClick={() => {
             setIsInfoTooltipOpen(false);
-            setIsLoginPopupOpen(true);
+            if (pendingCredentials) {
+              handleLoginSubmit({
+                email: pendingCredentials.email,
+                password: pendingCredentials.password,
+              });
+              setPendingCredentials(null);
+            } else {
+              setIsLoginPopupOpen(true);
+            }
           }}
         />
       </div>
