@@ -1,4 +1,5 @@
 import { NEWS_URL, NEWS_API_KEY } from "./constants";
+
 class NewsApi {
   constructor({ baseUrl, apiKey }) {
     this.baseUrl = baseUrl;
@@ -13,16 +14,14 @@ class NewsApi {
   }
 
   getNews(keyword) {
-    const toDate = new Date();
-    const fromDate = new Date();
-    fromDate.setDate(toDate.getDate() - 7);
+    const finalUrl = `${this.baseUrl}?q=${keyword}&apikey=${this.apiKey}&lang=es&max=10`;
 
-    const to = toDate.toISOString().split("T")[0];
-    const from = fromDate.toISOString().split("T")[0];
-
-    const finalUrl = `${this.baseUrl}?q=${keyword}&apiKey=${this.apiKey}&from=${from}&to=${to}&pageSize=100`;
-
-    return fetch(finalUrl).then((res) => this.checkResponse(res));
+    return fetch(finalUrl)
+      .then((res) => this.checkResponse(res))
+      .then((data) => {
+        console.log("Respuesta de GNews:", data);
+        return data;
+      });
   }
 }
 
