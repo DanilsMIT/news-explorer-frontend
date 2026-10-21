@@ -1,9 +1,6 @@
-import { NEWS_URL, NEWS_API_KEY } from "./constants";
-
 class NewsApi {
-  constructor({ baseUrl, apiKey }) {
+  constructor({ baseUrl }) {
     this.baseUrl = baseUrl;
-    this.apiKey = apiKey;
   }
 
   checkResponse(res) {
@@ -14,18 +11,19 @@ class NewsApi {
   }
 
   getNews(keyword) {
-    const finalUrl = `${this.baseUrl}?q=${keyword}&apikey=${this.apiKey}&lang=es&max=10`;
+    const finalUrl = `${this.baseUrl}/search-news?q=${keyword}`;
 
     return fetch(finalUrl)
       .then((res) => this.checkResponse(res))
       .then((data) => {
-        console.log("Respuesta de GNews:", data);
+        console.log("Respuesta desde mi Backend:", data);
         return data;
       });
   }
 }
 
+import { BASE_URL } from "./constants";
+
 export const newsApi = new NewsApi({
-  baseUrl: NEWS_URL,
-  apiKey: NEWS_API_KEY,
+  baseUrl: BASE_URL,
 });
