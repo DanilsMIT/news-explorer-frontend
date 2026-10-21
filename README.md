@@ -29,28 +29,32 @@ Un proyecto interactivo desarrollado en React que permite a los usuarios buscar 
 Para ejecutar el frontend de este proyecto en tu máquina local, sigue estos pasos:
 
 1. Clona este repositorio:
+
    ```bash
    git clone https://github.com/DanilsMIT/news-explorer-frontend.git
    ```
 
 2. Navega al directorio del proyecto:
+
    ```bash
    cd news-explorer-frontend
    ```
 
 3. Instala las dependencias necesarias:
+
    ```bash
    npm install
    ```
 
 4. Inicia el servidor de desarrollo local:
+
    ```bash
    npm run dev
    ```
 
 5. Abre tu navegador en la dirección local que te indique la terminal (por lo general `http://localhost:3000` o `http://localhost:5173`).
 
-*(Nota: Para la funcionalidad completa de registro y guardado, asegúrate de clonar y ejecutar también el servidor desde el [repositorio del backend](https://github.com/DanilsMIT/news-explorer-backend.git)).*
+_(Nota: Para la funcionalidad completa de registro y guardado, asegúrate de clonar y ejecutar también el servidor desde el [repositorio del backend](https://github.com/DanilsMIT/news-explorer-backend.git))._
 
 ## 👨‍💻 Autor
 
