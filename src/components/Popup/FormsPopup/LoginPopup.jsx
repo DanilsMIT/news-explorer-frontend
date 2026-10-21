@@ -4,9 +4,11 @@ import "./PopupForm.css";
 
 function LoginPopup({ isOpen, onClose, onSwitch, onSubmit }) {
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [password, setPassword] = useState("");
   const [generalError, setGeneralError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const isInvalid = !email || !password || emailError !== "";
 
   useEffect(() => {
     if (isOpen) {
@@ -19,6 +21,11 @@ function LoginPopup({ isOpen, onClose, onSwitch, onSubmit }) {
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    setEmailError(e.target.validationMessage);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -42,9 +49,10 @@ function LoginPopup({ isOpen, onClose, onSwitch, onSubmit }) {
           type="email"
           placeholder="Introduce tu correo electrónico"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={handleEmailChange}
           required
         />
+        <span className="popup__input-error">{emailError}</span>
 
         <label className="popup__label">Contraseña</label>
 
@@ -69,10 +77,10 @@ function LoginPopup({ isOpen, onClose, onSwitch, onSubmit }) {
 
         <button
           className={`popup__submit ${
-            !email || !password ? "popup__submit_disabled" : ""
+            isInvalid ? "popup__submit_disabled" : ""
           }`}
           type="submit"
-          disabled={!email || !password}
+          disabled={isInvalid}
         >
           Iniciar sesión
         </button>

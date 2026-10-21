@@ -1,3 +1,4 @@
+import { NEWS_URL, NEWS_API_KEY } from "./constants";
 class NewsApi {
   constructor({ baseUrl, apiKey }) {
     this.baseUrl = baseUrl;
@@ -26,6 +27,6 @@ class NewsApi {
 }
 
 export const newsApi = new NewsApi({
-  baseUrl: "https://nomoreparties.co/news/v2/everything",
-  apiKey: import.meta.env.VITE_NEWS_API_KEY,
+  baseUrl: NEWS_URL,
+  apiKey: NEWS_API_KEY,
 });

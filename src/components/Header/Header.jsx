@@ -1,9 +1,13 @@
+import { useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { CurrentUserContext } from "../../context/currentUserContext";
 import "./Header.css";
 
-function Header({ isLoggedIn, currentUser, onLoginClick, onLogout }) {
+function Header({ isLoggedIn, onLoginClick, onLogout }) {
   const location = useLocation();
   const isSavedNews = location.pathname === "/saved-news";
+
+  const currentUser = useContext(CurrentUserContext);
 
   return (
     <header className={`header ${isSavedNews ? "header_theme_light" : ""}`}>

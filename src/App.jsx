@@ -11,6 +11,7 @@ import RegisterPopup from "./components/Popup/FormsPopup/RegisterPopup";
 import InfoTooltip from "./components/Popup/InfoTooltip/InfoTooltip";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import { CurrentUserContext } from "./context/currentUserContext";
+import Preloader from "./components/Preloader/Preloader";
 import { newsApi } from "./utils/NewsApi";
 import { mainApi } from "./utils/MainApi";
 
@@ -24,6 +25,7 @@ function App() {
   const [searchError, setSearchError] = useState(false);
   const [currentKeyword, setCurrentKeyword] = useState("");
 
+  const [isCheckingToken, setIsCheckingToken] = useState(true);
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
   const [isRegisterPopupOpen, setIsRegisterPopupOpen] = useState(false);
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
@@ -51,7 +53,12 @@ function App() {
           localStorage.removeItem("jwt");
           setIsLoggedIn(false);
           setCurrentUser({ name: "User" });
+        })
+        .finally(() => {
+          setIsCheckingToken(false);
         });
+    } else {
+      setIsCheckingToken(false);
     }
   }, []);
 
@@ -61,18 +68,45 @@ function App() {
     setIsInfoTooltipOpen(false);
   };
 
-  const handleRegisterSubmit = (userData) => {
+  const handleRegisterSubmit = ({ email, password, name, setGeneralError }) => {
     mainApi
-      .register(userData.email, userData.password, userData.name)
+      .register(email, password, name)
       .then(() => {
+        return mainApi.login(email, password);
+      })
+      .then((data) => {
+        if (data.token) {
+          localStorage.setItem("jwt", data.token);
+          setIsLoggedIn(true);
+
+          return Promise.all([
+            mainApi.getUserInfo(data.token),
+            mainApi.getArticles(data.token),
+          ]);
+        }
+      })
+      .then(([userDataResp, articlesData]) => {
+        setCurrentUser({
+          name: userDataResp.name || userDataResp.data?.name || "User",
+        });
+
+        const articles = Array.isArray(articlesData)
+          ? articlesData
+          : articlesData.data || [];
+
+        setSavedArticles(articles.reverse());
         closeAllPopups();
         setIsInfoTooltipOpen(true);
       })
       .catch((err) => {
         console.error("Error al registrarse:", err);
+        if (typeof err === "string" && err.includes("409")) {
+          setGeneralError("Este correo electrónico ya está registrado.");
+        } else {
+          setGeneralError("Ocurrió un error durante el registro.");
+        }
       });
   };
-
   const handleLoginSubmit = ({ email, password, setGeneralError }) => {
     mainApi
       .login(email, password)
@@ -186,6 +220,14 @@ function App() {
       })
       .catch(console.error);
   };
+  // pantalla de carga
+  if (isCheckingToken) {
+    return (
+      <div className="popup popup_opened popup_type_preloader">
+        <Preloader />
+      </div>
+    );
+  }
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -197,7 +239,6 @@ function App() {
               <Fragment>
                 <Header
                   isLoggedIn={isLoggedIn}
-                  currentUser={currentUser}
                   onLogout={handleLogout}
                   onLoginClick={() => setIsLoginPopupOpen(true)}
                   onSearch={handleSearch}
@@ -220,13 +261,12 @@ function App() {
           <Route
             path="/saved-news"
             element={
-              <ProtectedRoute isLoggedIn={isLoggedIn}>
+              <ProtectedRoute
+                isLoggedIn={isLoggedIn}
+                onUnauthorized={() => setIsLoginPopupOpen(true)}
+              >
                 <Fragment>
-                  <Header
-                    isLoggedIn={isLoggedIn}
-                    currentUser={currentUser}
-                    onLogout={handleLogout}
-                  />
+                  <Header isLoggedIn={isLoggedIn} onLogout={handleLogout} />
                   <SavedNews
                     isLoggedIn={isLoggedIn}
                     savedArticles={savedArticles}

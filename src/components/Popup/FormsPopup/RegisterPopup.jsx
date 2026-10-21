@@ -6,11 +6,19 @@ function RegisterPopup({ isOpen, onClose, onSwitch, onSubmit }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [usernameError, setUsernameError] = useState("");
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [generalError, setGeneralError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const isInvalid =
+    !email ||
+    !password ||
+    !username ||
+    emailError !== "" ||
+    passwordError !== "" ||
+    usernameError !== "";
 
   useEffect(() => {
     if (isOpen) {
@@ -25,6 +33,10 @@ function RegisterPopup({ isOpen, onClose, onSwitch, onSubmit }) {
     }
   }, [isOpen]);
 
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+    setUsernameError(e.target.validationMessage);
+  };
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
     setEmailError(e.target.validationMessage);
@@ -45,20 +57,13 @@ function RegisterPopup({ isOpen, onClose, onSwitch, onSubmit }) {
     }
   };
 
-  const isInvalid =
-    !email ||
-    !password ||
-    !username ||
-    emailError !== "" ||
-    passwordError !== "";
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (isInvalid) return;
 
     setGeneralError("");
-    onSubmit({ email, password, name: username });
+    onSubmit({ email, password, name: username, setGeneralError });
   };
 
   return (
@@ -105,12 +110,11 @@ function RegisterPopup({ isOpen, onClose, onSwitch, onSubmit }) {
           type="text"
           placeholder="Introduce tu nombre de usuario"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={handleUsernameChange} // <-- Actualizado
           required
           minLength="2"
         />
-
-        <span className="popup__input-error"></span>
+        <span className="popup__input-error">{usernameError}</span>
 
         <span className="popup__general-error">{generalError}</span>
 

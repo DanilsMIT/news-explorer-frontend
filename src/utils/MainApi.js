@@ -1,3 +1,4 @@
+import { BASE_URL } from "./constants";
 class MainApi {
   constructor({ baseUrl }) {
     this.baseUrl = baseUrl;
@@ -67,11 +68,6 @@ class MainApi {
     }).then(this._checkResponse);
   }
 }
-
-// Configuración dinámica para producción (Vite)
-const BASE_URL = import.meta.env.PROD
-  ? import.meta.env.VITE_BASE_URL
-  : "http://localhost:3001";
 
 export const mainApi = new MainApi({
   baseUrl: BASE_URL,
