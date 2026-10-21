@@ -4,7 +4,7 @@ class MainApi {
     this.baseUrl = baseUrl;
   }
 
-  _checkResponse(res) {
+  checkResponse(res) {
     if (res.ok) {
       return res.json();
     }
@@ -16,7 +16,7 @@ class MainApi {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, name }),
-    }).then(this._checkResponse);
+    }).then(this.checkResponse);
   }
 
   login(email, password) {
@@ -24,7 +24,7 @@ class MainApi {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
-    }).then(this._checkResponse);
+    }).then(this.checkResponse);
   }
 
   getUserInfo(token) {
@@ -34,7 +34,7 @@ class MainApi {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    }).then(this._checkResponse);
+    }).then(this.checkResponse);
   }
 
   getArticles(token) {
@@ -44,7 +44,7 @@ class MainApi {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    }).then(this._checkResponse);
+    }).then(this.checkResponse);
   }
 
   saveArticle(token, articleData) {
@@ -55,7 +55,7 @@ class MainApi {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(articleData),
-    }).then(this._checkResponse);
+    }).then(this.checkResponse);
   }
 
   deleteArticle(token, articleId) {
@@ -65,7 +65,7 @@ class MainApi {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    }).then(this._checkResponse);
+    }).then(this.checkResponse);
   }
 }
 

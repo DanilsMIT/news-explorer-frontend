@@ -25,11 +25,12 @@ function App() {
   const [searchError, setSearchError] = useState(false);
   const [currentKeyword, setCurrentKeyword] = useState("");
   const [pendingCredentials, setPendingCredentials] = useState(null);
-
-  const [isCheckingToken, setIsCheckingToken] = useState(true);
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
   const [isRegisterPopupOpen, setIsRegisterPopupOpen] = useState(false);
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
+  const [isCheckingToken, setIsCheckingToken] = useState(
+    !!localStorage.getItem("jwt"),
+  );
 
   const navigate = useNavigate();
 
@@ -58,8 +59,6 @@ function App() {
         .finally(() => {
           setIsCheckingToken(false);
         });
-    } else {
-      setIsCheckingToken(false);
     }
   }, []);
 
