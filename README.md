@@ -4,7 +4,7 @@ Un proyecto interactivo desarrollado en React que permite a los usuarios buscar 
 
 ## 🔗 Enlaces del Proyecto
 
-- **Aplicación en vivo (Vercel):** [https://news-explorer-8gqlfx65c-aten7.vercel.app](https://news-explorer-8gqlfx65c-aten7.vercel.app)
+- **Aplicación en vivo (Vercel):** [https://news-explorer-psi.vercel.app](https://news-explorer-psi.vercel.app)
 - **Repositorio del Backend:** [https://github.com/DanilsMIT/news-explorer-backend.git](https://github.com/DanilsMIT/news-explorer-backend.git)
 - **API en vivo (Render):** [https://news-explorer-api-gc3x.onrender.com](https://news-explorer-api-gc3x.onrender.com)
 
